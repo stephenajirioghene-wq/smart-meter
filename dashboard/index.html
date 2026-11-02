@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sub-meter sign in</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login panel">
+      <h1>Sub-meter</h1>
+      <p class="sub">Sign in to see your units</p>
+
+      <!-- Shown while the role is read for an already signed-in user -->
+      <div id="loading" class="center muted">Checking your account…</div>
+
+      <!-- Sign-in form -->
+      <form id="loginForm" hidden novalidate>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="username" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="pw-wrap">
+            <input id="password" type="password" autocomplete="current-password" required>
+            <button type="button" id="togglePw" aria-label="Show password">Show</button>
+          </div>
+        </div>
+        <label class="check"><input id="keep" type="checkbox" checked> Keep me signed in on this device</label>
+        <button type="submit" class="primary" id="signInBtn">Sign in</button>
+        <p class="center"><button type="button" class="link" id="forgot">Forgot password?</button></p>
+      </form>
+
+      <!-- First sign-in: replace the temporary password -->
+      <form id="changeForm" hidden novalidate>
+        <p>Welcome. Please choose your own password to replace the temporary one.</p>
+        <div class="field">
+          <label for="newPw">New password (at least 8 characters)</label>
+          <input id="newPw" type="password" autocomplete="new-password" required>
+        </div>
+        <div class="field">
+          <label for="newPw2">Repeat new password</label>
+          <input id="newPw2" type="password" autocomplete="new-password" required>
+        </div>
+        <button type="submit" class="primary" id="changeBtn">Save password</button>
+      </form>
+
+      <div id="msg" class="msg" hidden></div>
+    </div>
+  </div>
+  <script type="module" src="js/login.js"></script>
+</body>
+</html>

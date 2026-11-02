@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My units</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1 id="greeting">Hello</h1>
+    <div class="topbar-right"><button data-signout>Sign out</button></div>
+  </header>
+
+  <main class="narrow">
+    <div id="errorBox" class="msg error" hidden></div>
+
+    <!-- Banners: readings paused / low balance / exhausted -->
+    <div id="pausedBanner" class="banner paused" hidden></div>
+    <div id="lowBanner" class="banner" hidden></div>
+
+    <!-- 2. Balance -->
+    <section class="panel ring-block">
+      <div id="ring" class="ring">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="track" cx="60" cy="60" r="52" fill="none" stroke-width="12"/>
+          <circle id="ringFill" class="fill" cx="60" cy="60" r="52" fill="none" stroke-width="12"
+                  stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="326.73"/>
+        </svg>
+        <div class="centre">
+          <div class="units num" id="units">–</div>
+          <div class="units-label">Wh left</div>
+          <div class="pct" id="pct"></div>
+        </div>
+      </div>
+      <span id="relayPill" class="pill off">–</span>
+    </section>
+
+    <!-- 4. Live now -->
+    <section class="panel">
+      <h2>Live now</h2>
+      <div class="stats">
+        <div class="stat"><div class="k">Using now</div><div class="v num" id="power">–</div></div>
+        <div class="stat"><div class="k">Time left</div><div class="v" id="timeLeft">–</div></div>
+      </div>
+      <p><button type="button" class="link" id="toggleDetails">Show meter details</button></p>
+      <div class="details" id="details" hidden>
+        <div class="stat"><div class="k">Voltage</div><div class="v num small" id="voltage">–</div></div>
+        <div class="stat"><div class="k">Current</div><div class="v num small" id="current">–</div></div>
+        <div class="stat"><div class="k">Power factor</div><div class="v num small" id="pf">–</div></div>
+      </div>
+    </section>
+
+    <!-- 5. Usage -->
+    <section class="panel">
+      <h2>Usage</h2>
+      <div class="stat" style="margin-bottom:12px"><div class="k">Used today</div><div class="v num" id="today">–</div></div>
+      <div class="chart-box"><canvas id="dailyChart" aria-label="Wh used per day, last 7 days"></canvas></div>
+    </section>
+
+    <!-- Request a top-up -->
+    <section class="panel">
+      <h2>Request a top-up</h2>
+      <form id="requestForm" novalidate>
+        <div class="row">
+          <div class="grow">
+            <label for="reqUnits">Wh (1 to 500000)</label>
+            <input id="reqUnits" type="number" min="1" max="500000" step="1" inputmode="numeric" required>
+          </div>
+          <button type="submit" class="primary" id="reqBtn" style="align-self:flex-end">Send request</button>
+        </div>
+      </form>
+      <div id="reqMsg" class="msg" hidden></div>
+    </section>
+
+    <!-- 6. My top-ups -->
+    <section class="panel">
+      <h2>My top-ups</h2>
+      <ul class="list" id="myTopUps"></ul>
+    </section>
+  </main>
+
+  <div class="footer" id="footer">Connecting…</div>
+
+  <dialog id="confirmDialog">
+    <form method="dialog">
+      <p data-msg></p>
+      <div class="actions">
+        <button value="cancel">Cancel</button>
+        <button value="ok" class="primary" data-ok>Confirm</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/tenant.js"></script>
+</body>
+</html>

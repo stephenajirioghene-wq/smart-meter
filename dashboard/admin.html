@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sub-meter admin</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1>Sub-meter admin</h1>
+    <div class="topbar-right">
+      <span class="who" id="who"></span>
+      <button data-signout>Sign out</button>
+    </div>
+  </header>
+  <nav class="nav">
+    <a href="#overview" data-nav="overview">Overview</a>
+    <a href="#topup" data-nav="topup">Top up units</a>
+    <a href="#tenants" data-nav="tenants">Tenants</a>
+    <a href="#log" data-nav="log">Top-up log</a>
+  </nav>
+
+  <main>
+    <div id="errorBox" class="msg error" hidden></div>
+
+    <!-- Status strip (overview and channel detail) -->
+    <div class="strip" id="strip">
+      <div class="tile"><div class="label">Device</div><div class="value" id="deviceStatus">–</div></div>
+      <div class="tile"><div class="label">Total live power</div><div class="value num" id="totalPower">–</div></div>
+      <div class="tile"><div class="label">Supply voltage</div><div class="value num" id="supplyVoltage">–</div></div>
+      <div class="tile alert" id="alertTile" hidden><div class="label">Balance alerts</div><div class="value" id="alertText"></div></div>
+    </div>
+
+    <!-- ===== 1. Overview ===== -->
+    <section data-view="overview" hidden>
+      <div class="panel" id="requestsPanel" hidden>
+        <h2>Top-up requests</h2>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Requested</th><th>Room</th><th class="num">Wh</th><th></th></tr></thead>
+          <tbody id="requestsBody"></tbody>
+        </table></div>
+      </div>
+      <div class="grid" id="cards" style="margin-top:16px"></div>
+      <div class="panel" style="margin-top:16px">
+        <h2>Recent top-ups</h2>
+        <div class="table-wrap" id="recentTopUps"></div>
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <h2>Landlord controls</h2>
+        <p class="muted small">Disconnect or reconnect one room with the button on its card.
+          Reset all units sets every room's balance to 0 Wh, so every room is disconnected until topped up.</p>
+        <button type="button" class="danger" id="resetBtn">Reset all units</button>
+        <div id="resetMsg" class="msg" hidden></div>
+      </div>
+    </section>
+
+    <!-- ===== 2. Channel detail ===== -->
+    <section data-view="channel" hidden>
+      <p><a href="#overview">← All rooms</a></p>
+      <div id="detailCard"></div>
+      <div class="two-col" style="margin-top:16px">
+        <div class="panel">
+          <h2>Power, last 24 hours</h2>
+          <div class="chart-box"><canvas id="powerChart" aria-label="Power over the last 24 hours"></canvas></div>
+        </div>
+        <div class="panel">
+          <h2>Energy per day, last 7 days</h2>
+          <div class="chart-box"><canvas id="dailyChart" aria-label="Wh per day over the last 7 days"></canvas></div>
+        </div>
+      </div>
+      <div class="two-col" style="margin-top:16px">
+        <div class="panel">
+          <h2>Estimated time left</h2>
+          <p class="balance" style="margin-top:0"><span id="detailHours">–</span></p>
+          <p class="muted small">Remaining balance ÷ average power over the last hour. Hidden below 5 W.</p>
+        </div>
+        <div class="panel">
+          <h2>Tenant name</h2>
+          <form id="detailNameForm" class="row" novalidate>
+            <input id="detailName" class="grow" maxlength="40" required>
+            <button type="submit" class="primary">Save</button>
+          </form>
+          <div id="detailNameMsg" class="msg" hidden></div>
+        </div>
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <h2>Top-ups for this room</h2>
+        <div class="table-wrap" id="detailTopUps"></div>
+      </div>
+    </section>
+
+    <!-- ===== 3. Top up units ===== -->
+    <section data-view="topup" hidden>
+      <div class="panel narrow">
+        <h2>Top up units</h2>
+        <form id="topUpForm" novalidate>
+          <div class="field">
+            <label for="topUpChannel">Room</label>
+            <select id="topUpChannel" required></select>
+          </div>
+          <div class="field">
+            <label for="topUpWh">Wh (1 to 500000)</label>
+            <input id="topUpWh" type="number" min="1" max="500000" step="1" inputmode="numeric" required>
+          </div>
+          <button type="submit" class="primary" id="topUpBtn">Top up</button>
+        </form>
+        <div id="topUpMsg" class="msg" hidden></div>
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <h2>Recent top-ups</h2>
+        <div class="table-wrap" id="topUpRecent"></div>
+      </div>
+    </section>
+
+    <!-- ===== Tenants ===== -->
+    <section data-view="tenants" hidden>
+      <div class="panel">
+        <h2>Room names</h2>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Channel</th><th>Tenant name</th><th></th></tr></thead>
+          <tbody id="namesBody"></tbody>
+        </table></div>
+        <div id="namesMsg" class="msg" hidden></div>
+      </div>
+
+      <div class="panel">
+        <h2>Accounts</h2>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Email</th><th>Role</th><th>Room</th><th></th></tr></thead>
+          <tbody id="accountsBody"></tbody>
+        </table></div>
+        <div id="accountsMsg" class="msg" hidden></div>
+      </div>
+
+      <div class="panel narrow">
+        <h2>Create tenant login</h2>
+        <form id="createForm" novalidate>
+          <div class="field">
+            <label for="newEmail">Tenant email</label>
+            <input id="newEmail" type="email" autocomplete="off" required>
+          </div>
+          <div class="field">
+            <label for="newPassword">Temporary password (at least 8 characters)</label>
+            <input id="newPassword" type="text" autocomplete="off" required>
+          </div>
+          <div class="field">
+            <label for="newChannel">Room</label>
+            <select id="newChannel" required></select>
+          </div>
+          <button type="submit" class="primary" id="createBtn">Create login</button>
+        </form>
+        <div id="createMsg" class="msg" hidden></div>
+        <p class="muted small">The tenant must change this password the first time they sign in.
+          Deleting a login or setting another user's password is done in Firebase Console.</p>
+      </div>
+    </section>
+
+    <!-- ===== 4. Top-up log ===== -->
+    <section data-view="log" hidden>
+      <div class="panel">
+        <div class="row" style="justify-content:space-between;margin-bottom:12px">
+          <h2 style="margin:0">Top-up log</h2>
+          <div class="row">
+            <select id="logFilter" style="width:auto"></select>
+            <button id="csvBtn">Export CSV</button>
+          </div>
+        </div>
+        <div class="table-wrap" id="logTable"></div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="confirmDialog">
+    <form method="dialog">
+      <p data-msg></p>
+      <div class="actions">
+        <button value="cancel">Cancel</button>
+        <button value="ok" class="primary" data-ok>Confirm</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>
