@@ -1,0 +1,53 @@
+# ---------------------------------------------------------------------------
+# Allow-list: everything is ignored unless it is named below.
+# The repository holds the final working system only. Ignored files stay on
+# your PC; nothing is deleted.
+# ---------------------------------------------------------------------------
+
+# Ignore everything at the top level...
+/*
+
+# ...except these files
+!/.gitignore
+!/README.md
+!/CHANGELOG.md
+!/PROJECT_STATUS.md
+!/Sub-meter dashboard spec.md
+!/serve-dashboard.ps1
+
+# Firmware: the two final sketches only
+!/firmware/
+/firmware/*
+!/firmware/submeter/
+!/firmware/sensor_read/
+
+# Web dashboard (all of it)
+!/dashboard/
+
+# Firebase: rules and config
+!/firebase/
+
+# Docs: architecture and hardware only
+!/docs/
+/docs/*
+!/docs/architecture/
+!/docs/hardware_setup/
+
+# ---------------------------------------------------------------------------
+# Never publish, even inside allowed folders
+# ---------------------------------------------------------------------------
+secrets.h
+.env
+.env.*
+*.pem
+*.key
+.firebaserc
+.firebase/
+firebase-debug.log
+*.zip
+*.log
+build/
+.vscode/
+Thumbs.db
+desktop.ini
+.DS_Store
